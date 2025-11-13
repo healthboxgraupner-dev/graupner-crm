@@ -168,7 +168,7 @@ const authApp = {
         }
     },
 
-    showLoginScreen() {
+        showLoginScreen() {
         document.getElementById('loginScreen').style.display = 'flex';
         document.getElementById('app').style.display = 'none';
     },
@@ -176,6 +176,7 @@ const authApp = {
     showMainApp() {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
+
         
         // Update header with user name
         document.getElementById('headerUserName').textContent = this.currentUser.name;
