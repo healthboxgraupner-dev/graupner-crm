@@ -168,7 +168,7 @@ const authApp = {
         }
     },
 
-        showLoginScreen() {
+    showLoginScreen() {
         document.getElementById('loginScreen').style.display = 'flex';
         document.getElementById('app').style.display = 'none';
     },
@@ -176,14 +176,12 @@ const authApp = {
     showMainApp() {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
-
         
-                // Update sidebar with user name
+        // Update sidebar with user name
         const userNameEl = document.getElementById('userName');
         if (userNameEl) {
             userNameEl.textContent = this.currentUser.name;
         }
-
         
         // Show/hide admin navigation based on role
         const adminNavItems = document.querySelectorAll('.admin-only');
