@@ -178,8 +178,12 @@ const authApp = {
         document.getElementById('app').style.display = 'block';
 
         
-        // Update header with user name
-        document.getElementById('headerUserName').textContent = this.currentUser.name;
+                // Update sidebar with user name
+        const userNameEl = document.getElementById('userName');
+        if (userNameEl) {
+            userNameEl.textContent = this.currentUser.name;
+        }
+
         
         // Show/hide admin navigation based on role
         const adminNavItems = document.querySelectorAll('.admin-only');
