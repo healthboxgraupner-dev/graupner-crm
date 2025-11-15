@@ -164,18 +164,37 @@ const usersModule = {
             event.stopPropagation();
         }
         
-        const firstNameEl = document.getElementById('userFirstName');
-        const lastNameEl = document.getElementById('userLastName');
-        const emailEl = document.getElementById('userEmail');
-        const passwordEl = document.getElementById('userPassword');
-        const roleEl = document.getElementById('userRole');
+        // Get form first to ensure proper scope
+        const form = document.getElementById('createUserForm');
+        if (!form) {
+            console.error('❌ Form nicht gefunden!');
+            alert('❌ Formular-Fehler! Bitte schließen und neu öffnen.');
+            return false;
+        }
+
+        // Get elements via form.querySelector for better reliability
+        const firstNameEl = form.querySelector('#userFirstName');
+        const lastNameEl = form.querySelector('#userLastName');
+        const emailEl = form.querySelector('#userEmail');
+        const passwordEl = form.querySelector('#userPassword');
+        const roleEl = form.querySelector('#userRole');
 
         console.log('Form elements found:', {
+            formFound: !!form,
             firstNameEl: !!firstNameEl,
             lastNameEl: !!lastNameEl,
             emailEl: !!emailEl,
             passwordEl: !!passwordEl,
             roleEl: !!roleEl
+        });
+        
+        console.log('Role element details:', {
+            roleEl: roleEl,
+            tagName: roleEl?.tagName,
+            id: roleEl?.id,
+            name: roleEl?.name,
+            type: roleEl?.type,
+            hasOptions: !!roleEl?.options
         });
 
         if (!firstNameEl || !lastNameEl || !emailEl || !passwordEl || !roleEl) {
