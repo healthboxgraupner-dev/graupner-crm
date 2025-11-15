@@ -71,12 +71,16 @@ const usersModule = {
         modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;';
         
         modal.innerHTML = `
-            <div style="background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%;">
+            <div style="background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;">
                 <h2>Neuer Benutzer</h2>
                 <form id="createUserForm">
                     <div class="form-group">
-                        <label>Name *</label>
-                        <input type="text" id="userName" name="name" required placeholder="z.B. Max Mustermann" autocomplete="off">
+                        <label>Vorname *</label>
+                        <input type="text" id="userFirstName" name="firstname" required placeholder="z.B. Max" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>Nachname *</label>
+                        <input type="text" id="userLastName" name="lastname" required placeholder="z.B. Mustermann" autocomplete="off">
                     </div>
                     <div class="form-group">
                         <label>E-Mail *</label>
@@ -141,10 +145,10 @@ const usersModule = {
         
         // Focus first input
         setTimeout(() => {
-            const nameInput = document.getElementById('userName');
-            if (nameInput) {
-                nameInput.focus();
-                console.log('✅ Name input focused');
+            const firstNameInput = document.getElementById('userFirstName');
+            if (firstNameInput) {
+                firstNameInput.focus();
+                console.log('✅ First name input focused');
             }
         }, 100);
         
@@ -160,19 +164,21 @@ const usersModule = {
             event.stopPropagation();
         }
         
-        const nameEl = document.getElementById('userName');
+        const firstNameEl = document.getElementById('userFirstName');
+        const lastNameEl = document.getElementById('userLastName');
         const emailEl = document.getElementById('userEmail');
         const passwordEl = document.getElementById('userPassword');
         const roleEl = document.getElementById('userRole');
 
         console.log('Form elements found:', {
-            nameEl: !!nameEl,
+            firstNameEl: !!firstNameEl,
+            lastNameEl: !!lastNameEl,
             emailEl: !!emailEl,
             passwordEl: !!passwordEl,
             roleEl: !!roleEl
         });
 
-        if (!nameEl || !emailEl || !passwordEl || !roleEl) {
+        if (!firstNameEl || !lastNameEl || !emailEl || !passwordEl || !roleEl) {
             console.error('❌ Formular-Elemente nicht gefunden!');
             alert('❌ Formular-Fehler! Bitte schließen und neu öffnen.');
             return false;
@@ -180,29 +186,39 @@ const usersModule = {
 
         // Debug: Log the actual values before trimming
         console.log('Raw values:', {
-            nameValue: nameEl.value,
+            firstNameValue: firstNameEl.value,
+            lastNameValue: lastNameEl.value,
             emailValue: emailEl.value,
             passwordValue: passwordEl.value,
             roleValue: roleEl.value
         });
 
         // Safely get values with fallback
-        const name = (nameEl.value || '').trim();
+        const firstName = (firstNameEl.value || '').trim();
+        const lastName = (lastNameEl.value || '').trim();
+        const fullName = `${firstName} ${lastName}`.trim();
         const email = (emailEl.value || '').trim().toLowerCase();
         const password = passwordEl.value || '';
         const role = roleEl.value || '';
 
         console.log('Eingabe-Werte:', { 
-            name: name, 
+            firstName: firstName,
+            lastName: lastName,
+            fullName: fullName,
             email: email, 
             passwordLength: password.length, 
             role: role 
         });
 
         // Validation
-        if (!name || name.length === 0) {
-            alert('❌ Bitte geben Sie einen Namen ein!');
-            nameEl.focus();
+        if (!firstName || firstName.length === 0) {
+            alert('❌ Bitte geben Sie einen Vornamen ein!');
+            firstNameEl.focus();
+            return false;
+        }
+        if (!lastName || lastName.length === 0) {
+            alert('❌ Bitte geben Sie einen Nachnamen ein!');
+            lastNameEl.focus();
             return false;
         }
         if (!email || !email.includes('@')) {
@@ -234,7 +250,9 @@ const usersModule = {
 
         const user = {
             id: generateId('user'),
-            name: name,
+            name: fullName,
+            firstName: firstName,
+            lastName: lastName,
             email: email,
             password: password,
             role: role,
