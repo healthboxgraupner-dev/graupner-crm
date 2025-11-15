@@ -190,7 +190,10 @@ const usersModule = {
             lastNameValue: lastNameEl.value,
             emailValue: emailEl.value,
             passwordValue: passwordEl.value,
-            roleValue: roleEl.value
+            roleValue: roleEl.value,
+            roleType: typeof roleEl.value,
+            roleSelectedIndex: roleEl.selectedIndex,
+            roleOptions: Array.from(roleEl.options).map(o => ({value: o.value, selected: o.selected}))
         });
 
         // Safely get values with fallback
@@ -199,7 +202,15 @@ const usersModule = {
         const fullName = `${firstName} ${lastName}`.trim();
         const email = (emailEl.value || '').trim().toLowerCase();
         const password = passwordEl.value || '';
-        const role = roleEl.value || '';
+        
+        // Get role value - try multiple ways
+        let role = roleEl.value;
+        if (!role && roleEl.selectedIndex >= 0) {
+            role = roleEl.options[roleEl.selectedIndex].value;
+        }
+        role = role || '';
+        
+        console.log('Role final value:', role);
 
         console.log('Eingabe-Werte:', { 
             firstName: firstName,
@@ -231,10 +242,28 @@ const usersModule = {
             passwordEl.focus();
             return false;
         }
-        if (!role || role === '') {
-            alert('❌ Bitte wählen Sie eine Rolle aus!');
-            roleEl.focus();
-            return false;
+        if (!role || role === '' || role === 'undefined') {
+            console.error('❌ ROLLE VALIDIERUNGS-FEHLER:');
+            console.error('  role value:', role);
+            console.error('  roleEl.value:', roleEl.value);
+            console.error('  roleEl.selectedIndex:', roleEl.selectedIndex);
+            console.error('  Selected option:', roleEl.options[roleEl.selectedIndex]);
+            console.error('  All options:', Array.from(roleEl.options).map(o => ({
+                value: o.value, 
+                text: o.text, 
+                selected: o.selected
+            })));
+            
+            // Try one more time to get the value
+            const retryRole = roleEl.options[roleEl.selectedIndex]?.value;
+            if (retryRole && retryRole !== '') {
+                console.log('✅ Rolle gefunden beim Retry:', retryRole);
+                role = retryRole;
+            } else {
+                alert('❌ Bitte wählen Sie eine Rolle aus!\n\nHinweis: Falls eine Rolle ausgewählt ist, löschen Sie bitte den Browser-Cache und laden Sie die Seite neu (Strg+Shift+R).');
+                roleEl.focus();
+                return false;
+            }
         }
 
         // Check if email already exists
