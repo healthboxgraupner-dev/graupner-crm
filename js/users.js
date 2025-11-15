@@ -60,61 +60,95 @@ const usersModule = {
     showAddForm() {
         console.log('═══ SHOW ADD FORM CALLED ═══');
         
-        // Entferne altes Modal falls vorhanden
-        const oldModal = document.getElementById('userFormModal');
-        if (oldModal) oldModal.remove();
+        // Entferne ALLE alten Modals falls vorhanden
+        const oldModals = document.querySelectorAll('#userFormModal, #editUserFormModal');
+        oldModals.forEach(modal => modal.remove());
+        console.log('✅ Alte Modals entfernt:', oldModals.length);
 
-        const modalHtml = `
-            <div id="userFormModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); 
-                        display: flex; align-items: center; justify-content: center; z-index: 1000;">
-                <div style="background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%;">
-                    <h2>Neuer Benutzer</h2>
-                    <form id="createUserForm" onsubmit="usersModule.handleCreateUser(event); return false;">
-                        <div class="form-group">
-                            <label>Name *</label>
-                            <input type="text" id="userName" name="name" required placeholder="z.B. Max Mustermann">
+        // Create modal element
+        const modal = document.createElement('div');
+        modal.id = 'userFormModal';
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;';
+        
+        modal.innerHTML = `
+            <div style="background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%;">
+                <h2>Neuer Benutzer</h2>
+                <form id="createUserForm">
+                    <div class="form-group">
+                        <label>Name *</label>
+                        <input type="text" id="userName" name="name" required placeholder="z.B. Max Mustermann" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>E-Mail *</label>
+                        <input type="email" id="userEmail" name="email" required placeholder="z.B. max.mustermann@healthbox.ae" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>Passwort *</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="userPassword" name="password" required minlength="8" placeholder="Mindestens 8 Zeichen" autocomplete="new-password">
+                            <button type="button" class="password-toggle" id="togglePasswordBtn">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label>E-Mail *</label>
-                            <input type="email" id="userEmail" name="email" required placeholder="z.B. max.mustermann@healthbox.ae">
-                        </div>
-                        <div class="form-group">
-                            <label>Passwort *</label>
-                            <div class="password-input-wrapper">
-                                <input type="password" id="userPassword" name="password" required minlength="8" placeholder="Mindestens 8 Zeichen">
-                                <button type="button" class="password-toggle" onclick="usersModule.togglePassword('userPassword'); return false;">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            <small style="color: var(--gray-600);">Das Passwort kann später geändert werden</small>
-                        </div>
-                        <div class="form-group">
-                            <label>Rolle *</label>
-                            <select id="userRole" name="role" required>
-                                <option value="">Bitte wählen...</option>
-                                <option value="partner">Partner</option>
-                                <option value="teamleader">Teamleader</option>
-                                <option value="admin">Admin</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-save"></i> Benutzer erstellen
-                        </button>
-                        <button type="button" class="btn" onclick="usersModule.closeModal(); return false;" style="margin-left: 10px;">
-                            Abbrechen
-                        </button>
-                    </form>
-                </div>
+                        <small style="color: var(--gray-600);">Das Passwort kann später geändert werden</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Rolle *</label>
+                        <select id="userRole" name="role" required>
+                            <option value="">Bitte wählen...</option>
+                            <option value="partner">Partner</option>
+                            <option value="teamleader">Teamleader</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success" id="createUserBtn">
+                        <i class="fas fa-save"></i> Benutzer erstellen
+                    </button>
+                    <button type="button" class="btn" id="cancelBtn" style="margin-left: 10px;">
+                        Abbrechen
+                    </button>
+                </form>
             </div>
         `;
         
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        console.log('✅ Modal inserted into DOM');
+        // Append to body
+        document.body.appendChild(modal);
+        console.log('✅ Modal appended to body');
+        
+        // Set up event listeners
+        const form = document.getElementById('createUserForm');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const toggleBtn = document.getElementById('togglePasswordBtn');
+        
+        // Form submit
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('📝 Form submitted via event listener');
+            this.handleCreateUser(e);
+        });
+        
+        // Cancel button
+        cancelBtn.addEventListener('click', () => {
+            console.log('❌ Cancel clicked');
+            this.closeModal();
+        });
+        
+        // Password toggle
+        toggleBtn.addEventListener('click', () => {
+            this.togglePassword('userPassword');
+        });
         
         // Focus first input
         setTimeout(() => {
-            document.getElementById('userName')?.focus();
+            const nameInput = document.getElementById('userName');
+            if (nameInput) {
+                nameInput.focus();
+                console.log('✅ Name input focused');
+            }
         }, 100);
+        
+        console.log('✅ All event listeners attached');
     },
 
     handleCreateUser(event) {
@@ -144,10 +178,19 @@ const usersModule = {
             return false;
         }
 
-        const name = nameEl.value.trim();
-        const email = emailEl.value.trim().toLowerCase();
-        const password = passwordEl.value;
-        const role = roleEl.value;
+        // Debug: Log the actual values before trimming
+        console.log('Raw values:', {
+            nameValue: nameEl.value,
+            emailValue: emailEl.value,
+            passwordValue: passwordEl.value,
+            roleValue: roleEl.value
+        });
+
+        // Safely get values with fallback
+        const name = (nameEl.value || '').trim();
+        const email = (emailEl.value || '').trim().toLowerCase();
+        const password = passwordEl.value || '';
+        const role = roleEl.value || '';
 
         console.log('Eingabe-Werte:', { 
             name: name, 
@@ -232,8 +275,11 @@ const usersModule = {
     },
 
     closeModal() {
-        const modal = document.getElementById('userFormModal') || document.getElementById('editUserFormModal');
-        if (modal) modal.remove();
+        console.log('🔒 Closing modal...');
+        const modals = document.querySelectorAll('#userFormModal, #editUserFormModal');
+        console.log('📋 Modals found to close:', modals.length);
+        modals.forEach(modal => modal.remove());
+        console.log('✅ All modals closed');
     },
 
     edit(id) {
