@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test User Creation Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #356c89;
+            margin-bottom: 10px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background: #356c89;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #2a5570;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        #console {
+            background: #f8f9fa;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+        }
+        .log-info {
+            color: #0066cc;
+        }
+        .log-success {
+            color: #28a745;
+        }
+        .log-error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 User Creation Test</h1>
+        <p style="color: #666; margin-bottom: 20px;">
+            This is a standalone test to verify the user creation form works correctly.
+        </p>
+
+        <div id="statusMessage"></div>
+
+        <form id="testCreateUserForm" onsubmit="handleTestSubmit(event); return false;">
+            <div class="form-group">
+                <label for="testUserName">Name *</label>
+                <input type="text" id="testUserName" name="name" required placeholder="z.B. Max Mustermann">
+            </div>
+            
+            <div class="form-group">
+                <label for="testUserEmail">E-Mail *</label>
+                <input type="email" id="testUserEmail" name="email" required placeholder="z.B. max.mustermann@healthbox.ae">
+            </div>
+            
+            <div class="form-group">
+                <label for="testUserPassword">Passwort *</label>
+                <input type="password" id="testUserPassword" name="password" required minlength="8" placeholder="Mindestens 8 Zeichen">
+            </div>
+            
+            <div class="form-group">
+                <label for="testUserRole">Rolle *</label>
+                <select id="testUserRole" name="role" required>
+                    <option value="">Bitte wählen...</option>
+                    <option value="partner">Partner</option>
+                    <option value="teamleader">Teamleader</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            
+            <button type="submit">✅ Benutzer erstellen (Test)</button>
+            <button type="button" class="btn-secondary" onclick="resetForm()">🔄 Formular zurücksetzen</button>
+        </form>
+
+        <h3 style="margin-top: 30px;">Console Log:</h3>
+        <div id="console"></div>
+    </div>
+
+    <script>
+        // Simple logging
+        function log(message, type = 'info') {
+            const consoleEl = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${timestamp}] ${message}`;
+            consoleEl.appendChild(entry);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+            console.log(`[${type.toUpperCase()}]`, message);
+        }
+
+        function showStatus(message, isSuccess) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.className = `status ${isSuccess ? 'success' : 'error'}`;
+            statusEl.textContent = message;
+            setTimeout(() => {
+                statusEl.textContent = '';
+                statusEl.className = '';
+            }, 5000);
+        }
+
+        function handleTestSubmit(event) {
+            log('═══ FORM SUBMIT TRIGGERED ═══', 'info');
+            
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            const name = formData.get('name').trim();
+            const email = formData.get('email').trim().toLowerCase();
+            const password = formData.get('password');
+            const role = formData.get('role');
+            
+            log(`Name: "${name}"`, 'info');
+            log(`Email: "${email}"`, 'info');
+            log(`Password length: ${password.length}`, 'info');
+            log(`Role: "${role}"`, 'info');
+            
+            // Validation
+            if (!name) {
+                log('❌ VALIDATION ERROR: Name is empty', 'error');
+                alert('❌ Bitte geben Sie einen Namen ein!');
+                return false;
+            }
+            
+            if (!email || !email.includes('@')) {
+                log('❌ VALIDATION ERROR: Invalid email', 'error');
+                alert('❌ Bitte geben Sie eine gültige E-Mail ein!');
+                return false;
+            }
+            
+            if (!password || password.length < 8) {
+                log('❌ VALIDATION ERROR: Password too short', 'error');
+                alert('❌ Passwort muss mindestens 8 Zeichen lang sein!');
+                return false;
+            }
+            
+            if (!role || role === '') {
+                log('❌ VALIDATION ERROR: No role selected', 'error');
+                alert('❌ Bitte wählen Sie eine Rolle aus!');
+                return false;
+            }
+            
+            log('✅ ALL VALIDATIONS PASSED', 'success');
+            
+            // Create user object
+            const user = {
+                id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                name: name,
+                email: email,
+                password: password,
+                role: role,
+                status: 'active',
+                created: Date.now()
+            };
+            
+            log('✅ User object created:', 'success');
+            log(JSON.stringify(user, null, 2), 'success');
+            
+            // Simulate saving (in real app, this would be DB.add('users', user))
+            try {
+                // Get existing users from localStorage
+                let users = JSON.parse(localStorage.getItem('crm_users_test') || '[]');
+                
+                // Check if email exists
+                const emailExists = users.find(u => u.email.toLowerCase() === email);
+                if (emailExists) {
+                    log('❌ Email already exists', 'error');
+                    alert('❌ Diese E-Mail-Adresse wird bereits verwendet!');
+                    return false;
+                }
+                
+                users.push(user);
+                localStorage.setItem('crm_users_test', JSON.stringify(users));
+                
+                log('✅ User saved to localStorage (crm_users_test)', 'success');
+                log(`✅ Total users in storage: ${users.length}`, 'success');
+                
+                showStatus(`✅ Benutzer "${user.name}" erfolgreich erstellt!`, true);
+                
+                // Reset form
+                form.reset();
+                
+            } catch (error) {
+                log(`❌ ERROR: ${error.message}`, 'error');
+                alert('❌ Fehler beim Speichern!');
+            }
+            
+            return false;
+        }
+
+        function resetForm() {
+            document.getElementById('testCreateUserForm').reset();
+            log('🔄 Form reset', 'info');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Test page loaded', 'success');
+            log('📋 Form submission handler: handleTestSubmit()', 'info');
+            log('---', 'info');
+            
+            // Check existing test users
+            const existingUsers = JSON.parse(localStorage.getItem('crm_users_test') || '[]');
+            log(`📊 Existing test users in storage: ${existingUsers.length}`, 'info');
+            
+            if (existingUsers.length > 0) {
+                log('Test users:', 'info');
+                existingUsers.forEach(u => {
+                    log(`  - ${u.name} (${u.email}, ${u.role})`, 'info');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
