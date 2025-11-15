@@ -193,7 +193,7 @@ const usersModule = {
             roleValue: roleEl.value,
             roleType: typeof roleEl.value,
             roleSelectedIndex: roleEl.selectedIndex,
-            roleOptions: Array.from(roleEl.options).map(o => ({value: o.value, selected: o.selected}))
+            roleOptions: roleEl.options ? Array.from(roleEl.options).map(o => ({value: o.value, selected: o.selected})) : 'undefined'
         });
 
         // Safely get values with fallback
@@ -205,12 +205,13 @@ const usersModule = {
         
         // Get role value - try multiple ways
         let role = roleEl.value;
-        if (!role && roleEl.selectedIndex >= 0) {
-            role = roleEl.options[roleEl.selectedIndex].value;
+        if (!role && roleEl.options && roleEl.selectedIndex >= 0) {
+            role = roleEl.options[roleEl.selectedIndex]?.value;
         }
         role = role || '';
         
         console.log('Role final value:', role);
+        console.log('Role extraction - roleEl.options exists:', !!roleEl.options);
 
         console.log('Eingabe-Werte:', { 
             firstName: firstName,
@@ -247,19 +248,20 @@ const usersModule = {
             console.error('  role value:', role);
             console.error('  roleEl.value:', roleEl.value);
             console.error('  roleEl.selectedIndex:', roleEl.selectedIndex);
-            console.error('  Selected option:', roleEl.options[roleEl.selectedIndex]);
-            console.error('  All options:', Array.from(roleEl.options).map(o => ({
+            console.error('  Selected option:', roleEl.options ? roleEl.options[roleEl.selectedIndex] : 'options undefined');
+            console.error('  All options:', roleEl.options ? Array.from(roleEl.options).map(o => ({
                 value: o.value, 
                 text: o.text, 
                 selected: o.selected
-            })));
+            })) : 'options undefined');
             
             // Try one more time to get the value
-            const retryRole = roleEl.options[roleEl.selectedIndex]?.value;
+            const retryRole = (roleEl.options && roleEl.selectedIndex >= 0) ? roleEl.options[roleEl.selectedIndex]?.value : null;
             if (retryRole && retryRole !== '') {
                 console.log('✅ Rolle gefunden beim Retry:', retryRole);
                 role = retryRole;
             } else {
+                console.error('❌ Retry fehlgeschlagen - roleEl.options:', roleEl.options);
                 alert('❌ Bitte wählen Sie eine Rolle aus!\n\nHinweis: Falls eine Rolle ausgewählt ist, löschen Sie bitte den Browser-Cache und laden Sie die Seite neu (Strg+Shift+R).');
                 roleEl.focus();
                 return false;
